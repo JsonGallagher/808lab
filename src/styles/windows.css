@@ -1,0 +1,286 @@
+/* 808Lab - Window Chrome Styling (Intermedia-inspired) */
+
+/* Desktop workspace */
+.desktop {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Global menubar */
+.menubar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: var(--white);
+  border-bottom: var(--border-width) solid var(--black);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  z-index: 10000;
+}
+
+.menubar-item {
+  position: relative;
+  padding: 2px 12px;
+  cursor: default;
+}
+
+.menubar-item:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.menubar-item.active {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* Dropdown menu */
+.menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  background: var(--white);
+  border: var(--border-width) solid var(--black);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+  z-index: 10001;
+}
+
+.menu-item {
+  padding: 4px 20px;
+  cursor: default;
+  display: flex;
+  justify-content: space-between;
+  color: var(--black);
+}
+
+.menu-item:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.menu-item.disabled {
+  color: var(--title-gray);
+}
+
+.menu-item.disabled:hover {
+  background: var(--white);
+  color: var(--title-gray);
+}
+
+.menu-separator {
+  border-top: var(--border-width) solid var(--black);
+  margin: 2px 0;
+}
+
+.menu-shortcut {
+  margin-left: 20px;
+  opacity: 0.7;
+}
+
+/* Window container */
+.window {
+  position: absolute;
+  background: var(--white);
+  border: var(--border-width) solid var(--black);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+
+.window.focused {
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+}
+
+/* Title bar with horizontal stripes */
+.title-bar {
+  height: 20px;
+  min-height: 20px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--title-gray) 0px,
+    var(--title-gray) 1px,
+    var(--white) 1px,
+    var(--white) 2px
+  );
+  border-bottom: var(--border-width) solid var(--black);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  cursor: grab;
+  user-select: none;
+}
+
+.title-bar:active {
+  cursor: grabbing;
+}
+
+/* Inactive window title bar */
+.window:not(.focused) .title-bar {
+  background: var(--title-gray);
+}
+
+/* Close box */
+.close-box {
+  width: 12px;
+  height: 12px;
+  border: var(--border-width) solid var(--black);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.close-box:hover {
+  background: var(--black);
+}
+
+.close-box::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: var(--border-width) solid var(--black);
+}
+
+.close-box:hover::after {
+  border-color: var(--white);
+}
+
+/* Window title */
+.window-title {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 8px;
+}
+
+/* Window content area */
+.window-content {
+  flex: 1;
+  overflow: auto;
+  background: var(--white);
+  padding: 8px;
+}
+
+/* Window with scroll */
+.window-content.scrollable {
+  overflow-y: scroll;
+}
+
+/* Classic scrollbar styling */
+.window-content::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+.window-content::-webkit-scrollbar-track {
+  background: var(--white);
+  border-left: var(--border-width) solid var(--black);
+}
+
+.window-content::-webkit-scrollbar-thumb {
+  background: var(--title-gray);
+  border: var(--border-width) solid var(--black);
+}
+
+.window-content::-webkit-scrollbar-button {
+  background: var(--title-gray);
+  border: var(--border-width) solid var(--black);
+  height: 16px;
+  width: 16px;
+}
+
+.window-content::-webkit-scrollbar-corner {
+  background: var(--title-gray);
+  border-left: var(--border-width) solid var(--black);
+  border-top: var(--border-width) solid var(--black);
+}
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background:
+    linear-gradient(135deg, transparent 50%, var(--black) 50%, var(--black) 55%, transparent 55%),
+    linear-gradient(135deg, transparent 60%, var(--black) 60%, var(--black) 65%, transparent 65%),
+    linear-gradient(135deg, transparent 70%, var(--black) 70%, var(--black) 75%, transparent 75%);
+}
+
+/* Status bar at bottom of window */
+.status-bar {
+  height: 18px;
+  min-height: 18px;
+  background: var(--title-gray);
+  border-top: var(--border-width) solid var(--black);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+}
+
+/* Split pane */
+.split-pane {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.split-pane.vertical {
+  flex-direction: column;
+}
+
+.split-pane.horizontal {
+  flex-direction: row;
+}
+
+.pane {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+.pane-divider {
+  background: var(--title-gray);
+  flex-shrink: 0;
+}
+
+.split-pane.horizontal > .pane-divider {
+  width: 1px;
+  border-left: var(--border-width) solid var(--black);
+  border-right: var(--border-width) solid var(--black);
+  cursor: ew-resize;
+}
+
+.split-pane.vertical > .pane-divider {
+  height: 1px;
+  border-top: var(--border-width) solid var(--black);
+  border-bottom: var(--border-width) solid var(--black);
+  cursor: ns-resize;
+}
+
+/* Panel with border */
+.panel {
+  border: var(--border-width) solid var(--black);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.panel-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}

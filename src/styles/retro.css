@@ -1,0 +1,141 @@
+/* 808Lab - Retro Base Styling (Intermedia-inspired) */
+
+/* CSS Variables */
+:root {
+  --white: #ffffff;
+  --title-gray: #c0c0c0;
+  --black: #000000;
+  --desktop-pattern: #d0d0d0;
+
+  /* Spacing */
+  --border-width: 1px;
+  --window-padding: 2px;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base Typography - Bitmap aesthetic */
+html {
+  font-family: "Geneva", "Monaco", "Lucida Console", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.3;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  text-rendering: optimizeSpeed;
+}
+
+body {
+  background: var(--desktop-pattern);
+  color: var(--black);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  cursor: default;
+  user-select: none;
+}
+
+/* Desktop fills viewport */
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Text selection */
+::selection {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* No smooth scrolling */
+* {
+  scroll-behavior: auto;
+}
+
+/* Bold labels */
+.label {
+  font-weight: bold;
+}
+
+/* Value display */
+.value {
+  font-weight: normal;
+}
+
+/* Inline label-value pair */
+.label-value {
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.label-value .label {
+  margin-right: 4px;
+}
+
+/* Section headers */
+.section-title {
+  font-weight: bold;
+  border-bottom: var(--border-width) solid var(--black);
+  padding-bottom: 2px;
+  margin-bottom: 8px;
+}
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: var(--border-width) solid var(--black);
+  margin: 8px 0;
+}
+
+/* Links in Intermedia style - boxed references */
+.link-box {
+  display: inline-flex;
+  align-items: center;
+  border: var(--border-width) solid var(--black);
+  padding: 1px 4px;
+  background: var(--white);
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.link-box:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.link-box::before {
+  content: ">";
+  margin-right: 3px;
+  font-weight: bold;
+}
+
+/* Disabled state */
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Focus outline - pixel perfect */
+:focus {
+  outline: var(--border-width) dotted var(--black);
+  outline-offset: 1px;
+}
+
+/* Hide default focus on buttons/controls */
+button:focus,
+input:focus,
+select:focus {
+  outline: none;
+}
+
+/* Pixel grid helper (debug) */
+.debug-grid {
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 8px 8px;
+}

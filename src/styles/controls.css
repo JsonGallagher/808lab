@@ -1,0 +1,422 @@
+/* 808Lab - Retro Control Styling (Intermedia-inspired) */
+
+/* Button */
+.retro-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  background: var(--white);
+  border: var(--border-width) solid var(--black);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  min-width: 60px;
+}
+
+.retro-button:hover {
+  background: var(--title-gray);
+}
+
+.retro-button:active {
+  background: var(--black);
+  color: var(--white);
+}
+
+.retro-button.primary {
+  background: var(--black);
+  color: var(--white);
+  border: 2px solid var(--black);
+}
+
+.retro-button.primary:hover {
+  background: #333;
+}
+
+.retro-button.primary:active {
+  background: var(--white);
+  color: var(--black);
+}
+
+.retro-button:disabled {
+  background: var(--title-gray);
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Small button */
+.retro-button.small {
+  padding: 2px 8px;
+  min-width: 40px;
+  font-size: 10px;
+}
+
+/* Button group */
+.button-group {
+  display: flex;
+  gap: 4px;
+}
+
+/* Slider/Range */
+.retro-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.retro-slider.horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+.slider-label {
+  font-weight: bold;
+  font-size: 10px;
+  min-width: 80px;
+}
+
+.slider-track {
+  position: relative;
+  height: 8px;
+  background: var(--white);
+  border: var(--border-width) solid var(--black);
+  cursor: pointer;
+  flex: 1;
+  min-width: 100px;
+}
+
+.slider-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: var(--black);
+}
+
+.slider-thumb {
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 14px;
+  background: var(--title-gray);
+  border: var(--border-width) solid var(--black);
+  transform: translateX(-50%);
+  cursor: grab;
+}
+
+.slider-thumb:active {
+  cursor: grabbing;
+  background: var(--black);
+}
+
+.slider-value {
+  font-size: 10px;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Slider ticks */
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  font-size: 9px;
+}
+
+.slider-tick {
+  position: relative;
+}
+
+.slider-tick::before {
+  content: "|";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+}
+
+/* Vertical slider */
+.retro-slider.vertical {
+  flex-direction: column;
+  align-items: center;
+  width: fit-content;
+}
+
+.retro-slider.vertical .slider-track {
+  width: 8px;
+  height: 100px;
+  min-width: 8px;
+  min-height: 100px;
+}
+
+.retro-slider.vertical .slider-fill {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.retro-slider.vertical .slider-thumb {
+  top: auto;
+  left: -3px;
+  width: 14px;
+  height: 8px;
+  transform: translateY(50%);
+}
+
+/* Text Input */
+.retro-input {
+  padding: 2px 4px;
+  background: var(--white);
+  border: var(--border-width) solid var(--black);
+  font-family: inherit;
+  font-size: 11px;
+  min-width: 60px;
+}
+
+.retro-input:focus {
+  outline: none;
+  background: #ffffcc;
+}
+
+.retro-input.small {
+  width: 50px;
+  min-width: 50px;
+}
+
+/* Number input with up/down buttons */
+.retro-number {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.retro-number input {
+  border-right: none;
+  text-align: right;
+}
+
+.retro-number-buttons {
+  display: flex;
+  flex-direction: column;
+  width: 14px;
+}
+
+.retro-number-btn {
+  flex: 1;
+  background: var(--title-gray);
+  border: var(--border-width) solid var(--black);
+  border-left: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  line-height: 1;
+}
+
+.retro-number-btn:first-child {
+  border-bottom: none;
+}
+
+.retro-number-btn:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* Select/Dropdown */
+.retro-select {
+  position: relative;
+  display: inline-block;
+  min-width: 100px;
+}
+
+.retro-select select {
+  width: 100%;
+  padding: 2px 20px 2px 4px;
+  background: var(--white);
+  border: var(--border-width) solid var(--black);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.retro-select::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid var(--black);
+  pointer-events: none;
+}
+
+.retro-select select:focus {
+  outline: none;
+  background: #ffffcc;
+}
+
+/* Checkbox */
+.retro-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.retro-checkbox input {
+  display: none;
+}
+
+.retro-checkbox .checkbox-box {
+  width: 12px;
+  height: 12px;
+  border: var(--border-width) solid var(--black);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.retro-checkbox input:checked + .checkbox-box::after {
+  content: "X";
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.retro-checkbox:hover .checkbox-box {
+  background: var(--title-gray);
+}
+
+/* Radio button */
+.retro-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.retro-radio input {
+  display: none;
+}
+
+.retro-radio .radio-circle {
+  width: 12px;
+  height: 12px;
+  border: var(--border-width) solid var(--black);
+  border-radius: 50%;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.retro-radio input:checked + .radio-circle::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--black);
+}
+
+.retro-radio:hover .radio-circle {
+  background: var(--title-gray);
+}
+
+/* Radio group */
+.radio-group {
+  display: flex;
+  gap: 12px;
+}
+
+.radio-group.vertical {
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Control row */
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.control-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Control label-value inline */
+.control-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.control-inline .label {
+  font-weight: bold;
+  font-size: 10px;
+}
+
+/* List box */
+.retro-listbox {
+  border: var(--border-width) solid var(--black);
+  background: var(--white);
+  min-height: 80px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.listbox-item {
+  padding: 2px 8px;
+  cursor: default;
+  font-weight: bold;
+}
+
+.listbox-item:hover {
+  background: var(--title-gray);
+}
+
+.listbox-item.selected {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* Trigger button (for triggering sounds) */
+.trigger-button {
+  width: 100%;
+  height: 50px;
+  background: var(--title-gray);
+  border: 2px solid var(--black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.trigger-button:hover {
+  background: #a0a0a0;
+}
+
+.trigger-button:active,
+.trigger-button.active {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* Keyboard hint */
+.key-hint {
+  font-size: 10px;
+  font-weight: bold;
+  color: #666;
+  margin-top: 8px;
+}
