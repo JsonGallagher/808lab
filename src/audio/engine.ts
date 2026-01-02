@@ -1,6 +1,11 @@
 import * as Tone from 'tone';
 import type { Sound808Params } from '../types';
 
+// Configure Tone.js for lower latency
+// lookAhead: time in seconds to schedule ahead (lower = less latency, but more CPU)
+// updateInterval: how often the scheduler runs
+Tone.getContext().lookAhead = 0.01; // 10ms instead of default 100ms
+
 // Default 808 parameters
 export const DEFAULT_PARAMS: Sound808Params = {
   synth: {
@@ -124,16 +129,17 @@ export class AudioEngine {
 
   private params: Sound808Params = { ...DEFAULT_PARAMS };
   private isInitialized = false;
+  private isInitializing = false; // Prevent double initialization
   private effectsConnected = false;
   private triggerTime: number = 0;
 
   async initialize(): Promise<void> {
-    if (this.isInitialized) return;
+    // Prevent double initialization (race condition protection)
+    if (this.isInitialized || this.isInitializing) return;
+    this.isInitializing = true;
 
-    // Start audio context
-    console.log('Initializing audio engine...');
+    // Start audio context with low-latency hint
     await Tone.start();
-    console.log('Audio context started:', Tone.getContext().state);
 
     // === MAIN SYNTH ===
     this.synth = new Tone.Synth({
@@ -243,6 +249,8 @@ export class AudioEngine {
       decay: this.params.reverb.decay,
       preDelay: this.params.reverb.preDelay,
     });
+    // Pre-generate reverb impulse response (don't await - let it generate in background)
+    this.reverb.generate();
     this.reverbDry = new Tone.Gain(1 - this.params.reverb.mix);
     this.reverbWet = new Tone.Gain(this.params.reverb.enabled ? this.params.reverb.mix : 0);
     this.reverbMix = new Tone.Gain(1);
@@ -251,8 +259,9 @@ export class AudioEngine {
     this.limiter = new Tone.Limiter(this.params.limiter.threshold);
 
     this.gain = new Tone.Gain(Tone.dbToGain(this.params.masterVolume));
-    this.analyser = new Tone.Analyser('waveform', 512);
-    this.fftAnalyser = new Tone.Analyser('fft', 256);
+    // Smaller analyser buffers = less latency (256/128 instead of 512/256)
+    this.analyser = new Tone.Analyser('waveform', 256);
+    this.fftAnalyser = new Tone.Analyser('fft', 128);
     this.bypassGain = new Tone.Gain(1);
 
     // === SIGNAL ROUTING ===
@@ -419,12 +428,10 @@ export class AudioEngine {
 
   // Trigger the 808 sound
   trigger(): void {
-    console.log('Trigger called, initialized:', this.isInitialized, 'synth:', !!this.synth);
     if (!this.synth || !this.isInitialized) return;
 
     const now = Tone.now();
     this.triggerTime = now;
-    console.log('Triggering at time:', now);
     const { synth, subOscillator, pitchEnvelope, ampEnvelope } = this.params;
 
     // Calculate frequencies
@@ -500,13 +507,13 @@ export class AudioEngine {
 
   // Get waveform data for visualization
   getWaveformData(): Float32Array {
-    if (!this.analyser) return new Float32Array(512);
+    if (!this.analyser) return new Float32Array(256);
     return this.analyser.getValue() as Float32Array;
   }
 
   // Get FFT data for spectrum visualization
   getFFTData(): Float32Array {
-    if (!this.fftAnalyser) return new Float32Array(256);
+    if (!this.fftAnalyser) return new Float32Array(128);
     return this.fftAnalyser.getValue() as Float32Array;
   }
 
@@ -720,9 +727,20 @@ export class AudioEngine {
     // Connect/disconnect filter envelope based on enabled state
     if (params.enabled !== undefined && this.filterEnvelope && this.filter) {
       if (params.enabled) {
-        this.filterEnvelope.connect(this.filter.frequency);
+        // Connect envelope to filter frequency
+        try {
+          this.filterEnvelope.connect(this.filter.frequency);
+        } catch {
+          // Already connected, ignore
+        }
       } else {
-        this.filterEnvelope.disconnect();
+        // Disconnect envelope from filter frequency specifically
+        try {
+          this.filterEnvelope.disconnect(this.filter.frequency);
+        } catch {
+          // Not connected or already disconnected, ignore
+        }
+        // Reset filter to base frequency
         this.filter.frequency.value = this.params.filter.frequency;
       }
     }
@@ -997,6 +1015,7 @@ export class AudioEngine {
     this.bypassGain = null;
 
     this.isInitialized = false;
+    this.isInitializing = false;
     this.effectsConnected = false;
   }
 }

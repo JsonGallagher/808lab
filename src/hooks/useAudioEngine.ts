@@ -6,8 +6,8 @@ export function useAudioEngine() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [params, setParams] = useState<Sound808Params>(DEFAULT_PARAMS);
-  const [waveformData, setWaveformData] = useState<Float32Array>(new Float32Array(512));
-  const [fftData, setFftData] = useState<Float32Array>(new Float32Array(256));
+  const [waveformData, setWaveformData] = useState<Float32Array>(new Float32Array(256));
+  const [fftData, setFftData] = useState<Float32Array>(new Float32Array(128));
   const [triggerTime, setTriggerTime] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
@@ -165,21 +165,29 @@ export function useAudioEngine() {
     return audioEngine.renderOffline();
   }, [isInitialized, initialize]);
 
-  // Waveform and FFT animation loop
+  // Waveform and FFT animation loop (throttled to ~30fps for performance)
   useEffect(() => {
     if (!isInitialized) return;
 
-    const updateAnalysers = () => {
-      // Create copies of arrays so React detects the change
-      const waveData = audioEngine.getWaveformData();
-      setWaveformData(new Float32Array(waveData));
+    let lastUpdate = 0;
+    const targetInterval = 1000 / 30; // 30fps
 
-      const fft = audioEngine.getFFTData();
-      setFftData(new Float32Array(fft));
+    const updateAnalysers = (timestamp: number) => {
+      // Throttle updates to reduce CPU usage
+      if (timestamp - lastUpdate >= targetInterval) {
+        lastUpdate = timestamp;
 
-      // Update timing for playhead
-      setTriggerTime(audioEngine.getTriggerTime());
-      setCurrentTime(audioEngine.getCurrentTime());
+        // Create copies of arrays so React detects the change
+        const waveData = audioEngine.getWaveformData();
+        setWaveformData(new Float32Array(waveData));
+
+        const fft = audioEngine.getFFTData();
+        setFftData(new Float32Array(fft));
+
+        // Update timing for playhead
+        setTriggerTime(audioEngine.getTriggerTime());
+        setCurrentTime(audioEngine.getCurrentTime());
+      }
 
       animationRef.current = requestAnimationFrame(updateAnalysers);
     };
@@ -205,6 +213,30 @@ export function useAudioEngine() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [trigger]);
+
+  // Eager initialization: init audio engine on first user interaction
+  // This reduces latency on the first actual trigger
+  useEffect(() => {
+    if (isInitialized) return;
+
+    const initOnInteraction = () => {
+      if (!isInitialized) {
+        initialize();
+      }
+    };
+
+    // Listen for any user gesture to initialize audio early
+    const events = ['click', 'touchstart', 'keydown'];
+    events.forEach(event => {
+      window.addEventListener(event, initOnInteraction, { once: true, passive: true });
+    });
+
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, initOnInteraction);
+      });
+    };
+  }, [isInitialized, initialize]);
 
   // Cleanup
   useEffect(() => {
