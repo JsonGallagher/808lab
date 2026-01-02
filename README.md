@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+# 808Lab
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A retro-styled 808 bass synthesizer with a classic Macintosh-inspired UI. Built with React, TypeScript, and Tone.js.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Sound Synthesis
+- **Main Oscillator** - Sine/triangle waveforms with pitch envelope control
+- **Sub Oscillator** - Adds deep fundamental with octave (-1/-2) and detune controls
+- **Noise/Click Layer** - White/pink noise for transient punch with decay and filter
+- **Filter Envelope** - ADSR-controlled frequency sweep for dynamic tones
 
-## React Compiler
+### Effects
+- **Distortion** - Multiple saturation types: Soft Clip, Hard Clip, Tape, Waveshaper, Bitcrush
+- **Filter** - Low-pass filter with resonance control
+- **Compressor** - Threshold, ratio, attack, and release controls
+- **3-Band EQ** - Low, mid, and high frequency adjustment
+- **Reverb** - Decay time, pre-delay, and wet/dry mix
+- **Limiter** - Output protection with threshold control
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Waveform Analyzer
+- **Wave/FFT Toggle** - Switch between waveform and spectrum views
+- **Logarithmic FFT** - Better sub-bass visualization
+- **Zoom Controls** - 1x, 2x, 4x, 8x zoom levels
+- **Playhead Animation** - Visual playback indicator
+- **Envelope Overlay** - ADSR shape visualization
+- **Peak/RMS Meter** - dB readouts with clipping indicator
 
-## Expanding the ESLint configuration
+### Presets
+- **10 Factory Presets** - Classic 808, Distorted 808, Deep Sub, Punchy 808, Trap Sub, Lo-Fi 808, Smooth, Synth Bass, Booming, Tape Warm
+- **Categories** - Classic, Modern, Lo-Fi, Aggressive, Clean, User
+- **Import/Export** - Save and load presets as JSON files
+- **Randomize** - Generate random parameter variations
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Visual Design
+- Classic Macintosh-style window chrome and controls
+- Modular cable patching with wiggle animations
+- LED activity indicators
+- Dithered meter bars with checkerboard patterns
+- Window zoom animations
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
+- Node.js 18+
+- npm or yarn
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Build
+
+```bash
+npm run build
+```
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+## Usage
+
+1. **Trigger sounds** - Click the Trigger button or press Space
+2. **Shape your tone** - Adjust oscillator, envelope, and filter parameters
+3. **Add effects** - Connect the synth to effects using the modular cables
+4. **Export** - Render and download your sound as a WAV file
+5. **Save presets** - Store your favorite sounds for later
+
+## Tech Stack
+
+- **React 19** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **Tone.js** - Web Audio synthesis
+
+## License
+
+MIT
