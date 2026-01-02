@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Window } from '../desktop';
 import { RetroSlider, RetroButton, RetroCheckbox } from '../controls';
-import type { Sound808Params } from '../../types';
+import type { Sound808Params, WindowPosition, WindowSize } from '../../types';
 
 interface OutputWindowProps {
   masterVolume: number;
@@ -18,6 +18,8 @@ interface OutputWindowProps {
   };
   onClose: () => void;
   onFocus: () => void;
+  initialPosition: WindowPosition;
+  initialSize: WindowSize;
 }
 
 export function OutputWindow({
@@ -31,6 +33,8 @@ export function OutputWindow({
   windowState,
   onClose,
   onFocus,
+  initialPosition,
+  initialSize,
 }: OutputWindowProps) {
   const [previewData, setPreviewData] = useState<Float32Array | null>(null);
   const [isRendering, setIsRendering] = useState(false);
@@ -107,8 +111,8 @@ export function OutputWindow({
     <Window
       id="output"
       title="808Lab - Output"
-      initialPosition={{ x: 965, y: 405 }}
-      initialSize={{ width: 280, height: 390 }}
+      initialPosition={initialPosition}
+      initialSize={initialSize}
       isVisible={windowState.isVisible}
       isFocused={windowState.isFocused}
       zIndex={windowState.zIndex}

@@ -294,17 +294,20 @@ export class AudioEngine {
     this.gain.connect(this.fftAnalyser);
     this.analyser.connect(Tone.getDestination());
 
-    // Start with effects disconnected (bypass mode)
-    this.setEffectsConnected(false);
-
+    // Mark as initialized first so setEffectsConnected works
     this.isInitialized = true;
+
+    // Apply the current effects connection state (may have been set before init by CablesManager)
+    this.setEffectsConnected(this.effectsConnected);
   }
 
   // Connect or disconnect effects
   setEffectsConnected(connected: boolean): void {
+    // Always store the desired state (even before initialization)
     this.effectsConnected = connected;
 
-    if (this.distortionMix && this.bypassGain && this.gain && this.filter && this.compressor && this.eq && this.reverbMix) {
+    // Only apply routing if initialized
+    if (this.isInitialized && this.distortionMix && this.bypassGain && this.gain && this.filter && this.compressor && this.eq && this.reverbMix) {
       if (connected) {
         // Effects path active, bypass muted
         try {

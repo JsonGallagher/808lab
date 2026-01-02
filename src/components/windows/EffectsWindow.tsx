@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Window } from '../desktop';
 import { RetroSlider, RetroSelect, RetroCheckbox } from '../controls';
 import { Jack, type CablesManager } from '../Cables';
-import type { Sound808Params } from '../../types';
+import type { Sound808Params, WindowPosition, WindowSize } from '../../types';
 
 // Collapsible panel component
 function CollapsiblePanel({
@@ -75,6 +75,8 @@ interface EffectsWindowProps {
   onClose: () => void;
   onFocus: () => void;
   cablesManager: CablesManager;
+  initialPosition: WindowPosition;
+  initialSize: WindowSize;
 }
 
 const FILTER_TYPES = [
@@ -103,6 +105,8 @@ export function EffectsWindow({
   onClose,
   onFocus,
   cablesManager,
+  initialPosition,
+  initialSize,
 }: EffectsWindowProps) {
   // Collapsed state for optional sections
   const [compressorExpanded, setCompressorExpanded] = useState(false);
@@ -112,8 +116,8 @@ export function EffectsWindow({
     <Window
       id="effects"
       title="808Lab - Effects"
-      initialPosition={{ x: 630, y: 55 }}
-      initialSize={{ width: 300, height: 620 }}
+      initialPosition={initialPosition}
+      initialSize={initialSize}
       isVisible={windowState.isVisible}
       isFocused={windowState.isFocused}
       zIndex={windowState.zIndex}

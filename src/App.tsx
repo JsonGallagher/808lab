@@ -1,6 +1,7 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { exportToWAV } from './audio/wavExport';
 import { generateRandomParams } from './utils/randomize';
+import { calculateWindowLayout } from './utils/windowLayout';
 import { Desktop } from './components/desktop';
 import {
   SynthWindow,
@@ -12,7 +13,7 @@ import {
 import { CablesManager, CablesOverlay } from './components/Cables';
 import { useAudioEngine } from './hooks/useAudioEngine';
 import { usePresets } from './hooks/usePresets';
-import type { Menu, Preset } from './types';
+import type { Menu, Preset, WindowPosition, WindowSize } from './types';
 
 import './styles/retro.css';
 import './styles/windows.css';
@@ -39,6 +40,20 @@ function App() {
   const [windowStates, setWindowStates] = useState<WindowStates>(INITIAL_WINDOW_STATES);
   const [focusedWindow, setFocusedWindow] = useState<WindowId>('synth');
   const [maxZIndex, setMaxZIndex] = useState(5);
+
+  // Calculate window layouts based on viewport size
+  const [windowLayouts, setWindowLayouts] = useState(() =>
+    calculateWindowLayout(window.innerWidth, window.innerHeight)
+  );
+
+  // Recalculate layout only on initial mount (not on resize, as users may have moved windows)
+  useEffect(() => {
+    setWindowLayouts(calculateWindowLayout(window.innerWidth, window.innerHeight));
+  }, []);
+
+  const getWindowLayout = (id: string): { position: WindowPosition; size: WindowSize } => {
+    return windowLayouts[id] || { position: { x: 50, y: 50 }, size: { width: 300, height: 400 } };
+  };
 
   const {
     isPlaying,
@@ -212,6 +227,8 @@ function App() {
         onClose={() => handleCloseWindow('synth')}
         onFocus={() => handleFocusWindow('synth')}
         cablesManager={cablesManager}
+        initialPosition={getWindowLayout('synth').position}
+        initialSize={getWindowLayout('synth').size}
       />
 
       <EffectsWindow
@@ -226,6 +243,8 @@ function App() {
         onClose={() => handleCloseWindow('effects')}
         onFocus={() => handleFocusWindow('effects')}
         cablesManager={cablesManager}
+        initialPosition={getWindowLayout('effects').position}
+        initialSize={getWindowLayout('effects').size}
       />
 
       <CablesOverlay manager={cablesManager} isPulsing={isPlaying} />
@@ -241,6 +260,8 @@ function App() {
         windowState={getWindowState('output')}
         onClose={() => handleCloseWindow('output')}
         onFocus={() => handleFocusWindow('output')}
+        initialPosition={getWindowLayout('output').position}
+        initialSize={getWindowLayout('output').size}
       />
 
       <PresetsWindow
@@ -255,6 +276,8 @@ function App() {
         windowState={getWindowState('presets')}
         onClose={() => handleCloseWindow('presets')}
         onFocus={() => handleFocusWindow('presets')}
+        initialPosition={getWindowLayout('presets').position}
+        initialSize={getWindowLayout('presets').size}
       />
 
       <AboutWindow

@@ -2,7 +2,7 @@ import { Window } from '../desktop';
 import { RetroSlider, RetroSelect, TriggerButton, RetroCheckbox } from '../controls';
 import { Waveform } from '../Waveform';
 import { Jack, type CablesManager } from '../Cables';
-import type { Sound808Params } from '../../types';
+import type { Sound808Params, WindowPosition, WindowSize } from '../../types';
 
 interface SynthWindowProps {
   params: Sound808Params;
@@ -25,6 +25,8 @@ interface SynthWindowProps {
   onClose: () => void;
   onFocus: () => void;
   cablesManager: CablesManager;
+  initialPosition: WindowPosition;
+  initialSize: WindowSize;
 }
 
 const NOTES = [
@@ -75,13 +77,15 @@ export function SynthWindow({
   onClose,
   onFocus,
   cablesManager,
+  initialPosition,
+  initialSize,
 }: SynthWindowProps) {
   return (
     <Window
       id="synth"
       title="808Lab - Synthesizer"
-      initialPosition={{ x: 20, y: 35 }}
-      initialSize={{ width: 580, height: 760 }}
+      initialPosition={initialPosition}
+      initialSize={initialSize}
       isVisible={windowState.isVisible}
       isFocused={windowState.isFocused}
       zIndex={windowState.zIndex}

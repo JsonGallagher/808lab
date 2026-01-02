@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Window } from '../desktop';
 import { RetroButton, RetroInput, RetroSelect } from '../controls';
-import type { Preset, PresetCategory } from '../../types';
+import type { Preset, PresetCategory, WindowPosition, WindowSize } from '../../types';
 
 interface PresetsWindowProps {
   presets: Preset[];
@@ -19,6 +19,8 @@ interface PresetsWindowProps {
   };
   onClose: () => void;
   onFocus: () => void;
+  initialPosition: WindowPosition;
+  initialSize: WindowSize;
 }
 
 const CATEGORY_OPTIONS = [
@@ -43,6 +45,8 @@ export function PresetsWindow({
   windowState,
   onClose,
   onFocus,
+  initialPosition,
+  initialSize,
 }: PresetsWindowProps) {
   const [selectedId, setSelectedId] = useState<string | null>(currentPresetId);
   const [newPresetName, setNewPresetName] = useState('');
@@ -122,8 +126,8 @@ export function PresetsWindow({
     <Window
       id="presets"
       title="Presets"
-      initialPosition={{ x: 955, y: 45 }}
-      initialSize={{ width: 300, height: 340 }}
+      initialPosition={initialPosition}
+      initialSize={initialSize}
       isVisible={windowState.isVisible}
       isFocused={windowState.isFocused}
       zIndex={windowState.zIndex}
