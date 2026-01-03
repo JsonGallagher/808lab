@@ -8,10 +8,11 @@ interface WindowLayout {
 // Window configurations with their proper sizes (to fit all content without scrollbars)
 // These match the original hardcoded sizes from each window component
 const WINDOW_CONFIGS: Record<string, WindowSize> = {
-  synth: { width: 580, height: 760 },
-  effects: { width: 300, height: 620 },
+  synth: { width: 580, height: 870 },
+  effects: { width: 300, height: 645 },
   presets: { width: 300, height: 340 },
   output: { width: 280, height: 390 },
+  keyboard: { width: 815, height: 210 },
 };
 
 // Layout constants
@@ -97,6 +98,15 @@ export function calculateWindowLayout(
       y: startY + configs.presets.height + MIN_GAP + 25
     },
     size: configs.output,
+  };
+
+  // Keyboard window - near bottom of screen, centered horizontally
+  layouts.keyboard = {
+    position: {
+      x: Math.max(MARGIN, (viewportWidth - configs.keyboard.width) / 2),
+      y: startY + configs.synth.height + MIN_GAP + 100
+    },
+    size: configs.keyboard,
   };
 
   return layouts;

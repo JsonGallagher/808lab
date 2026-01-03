@@ -153,7 +153,18 @@ export function EffectsWindow({
             label="Type"
             value={params.distortion.type}
             options={DISTORTION_TYPES}
-            onChange={(type) => onUpdateDistortion({ type: type as Sound808Params['distortion']['type'] })}
+            onChange={(type) => {
+              const updates: Partial<Sound808Params['distortion']> = {
+                type: type as Sound808Params['distortion']['type']
+              };
+              // Apply bitcrush-specific defaults when switching to bitcrush
+              if (type === 'bitcrush') {
+                updates.drive = 0.6;
+                updates.bitDepth = 2;
+                updates.mix = 0.8;
+              }
+              onUpdateDistortion(updates);
+            }}
           />
         </div>
         <div className="control-row">

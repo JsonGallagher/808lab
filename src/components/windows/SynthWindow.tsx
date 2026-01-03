@@ -17,6 +17,7 @@ interface SynthWindowProps {
   onUpdateNoiseLayer: (updates: Partial<Sound808Params['noiseLayer']>) => void;
   onUpdatePitchEnvelope: (updates: Partial<Sound808Params['pitchEnvelope']>) => void;
   onUpdateAmpEnvelope: (updates: Partial<Sound808Params['ampEnvelope']>) => void;
+  onUpdateLFO: (updates: Partial<Sound808Params['lfo']>) => void;
   windowState: {
     isVisible: boolean;
     isFocused: boolean;
@@ -28,17 +29,6 @@ interface SynthWindowProps {
   initialPosition: WindowPosition;
   initialSize: WindowSize;
 }
-
-const NOTES = [
-  { value: 'C1', label: 'C1 (32.7 Hz)' },
-  { value: 'D1', label: 'D1 (36.7 Hz)' },
-  { value: 'E1', label: 'E1 (41.2 Hz)' },
-  { value: 'F1', label: 'F1 (43.7 Hz)' },
-  { value: 'G1', label: 'G1 (49.0 Hz)' },
-  { value: 'A1', label: 'A1 (55.0 Hz)' },
-  { value: 'B1', label: 'B1 (61.7 Hz)' },
-  { value: 'C2', label: 'C2 (65.4 Hz)' },
-];
 
 const WAVEFORMS = [
   { value: 'sine', label: 'Sine' },
@@ -60,6 +50,21 @@ const NOISE_TYPES = [
   { value: 'pink', label: 'Pink' },
 ];
 
+const LFO_DIVISIONS = [
+  { value: '1/2', label: '1/2' },
+  { value: '1/4', label: '1/4' },
+  { value: '1/8', label: '1/8' },
+  { value: '1/16', label: '1/16' },
+  { value: '1/32', label: '1/32' },
+];
+
+const LFO_WAVEFORMS = [
+  { value: 'sine', label: 'Sine' },
+  { value: 'square', label: 'Square' },
+  { value: 'triangle', label: 'Triangle' },
+  { value: 'sawtooth', label: 'Saw' },
+];
+
 export function SynthWindow({
   params,
   isPlaying,
@@ -73,6 +78,7 @@ export function SynthWindow({
   onUpdateNoiseLayer,
   onUpdatePitchEnvelope,
   onUpdateAmpEnvelope,
+  onUpdateLFO,
   windowState,
   onClose,
   onFocus,
@@ -116,14 +122,6 @@ export function SynthWindow({
           />
 
           <div className="section-title" style={{ marginTop: '16px' }}>Oscillator</div>
-          <div className="control-row">
-            <RetroSelect
-              label="Note"
-              value={params.synth.note}
-              options={NOTES}
-              onChange={(note) => onUpdateSynth({ note })}
-            />
-          </div>
           <div className="control-row">
             <RetroSelect
               label="Wave"
@@ -191,11 +189,11 @@ export function SynthWindow({
                 label="Attack"
                 value={params.ampEnvelope.attack}
                 min={0.001}
-                max={0.1}
+                max={2}
                 step={0.001}
                 unit=" s"
                 onChange={(attack) => onUpdateAmpEnvelope({ attack })}
-                formatValue={(v) => v.toFixed(3) + ' s'}
+                formatValue={(v) => v < 1 ? (v * 1000).toFixed(0) + ' ms' : v.toFixed(2) + ' s'}
               />
             </div>
             <div className="control-row">
@@ -327,6 +325,60 @@ export function SynthWindow({
               unit=" Hz"
               onChange={(filterFreq) => onUpdateNoiseLayer({ filterFreq })}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* LFO */}
+      <div className="panel" style={{ marginTop: '12px' }}>
+        <div className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <RetroCheckbox
+            label="LFO (Wobble)"
+            checked={params.lfo.enabled}
+            onChange={(enabled) => onUpdateLFO({ enabled })}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <div className="control-row">
+              <RetroSlider
+                label="BPM"
+                value={params.lfo.bpm}
+                min={60}
+                max={200}
+                step={1}
+                onChange={(bpm) => onUpdateLFO({ bpm })}
+              />
+            </div>
+            <div className="control-row">
+              <RetroSelect
+                label="Rate"
+                value={params.lfo.division}
+                options={LFO_DIVISIONS}
+                onChange={(division) => onUpdateLFO({ division: division as Sound808Params['lfo']['division'] })}
+              />
+            </div>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div className="control-row">
+              <RetroSlider
+                label="Depth"
+                value={params.lfo.depth}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(depth) => onUpdateLFO({ depth })}
+                formatValue={(v) => Math.round(v * 100) + '%'}
+              />
+            </div>
+            <div className="control-row">
+              <RetroSelect
+                label="Wave"
+                value={params.lfo.waveform}
+                options={LFO_WAVEFORMS}
+                onChange={(waveform) => onUpdateLFO({ waveform: waveform as Sound808Params['lfo']['waveform'] })}
+              />
+            </div>
           </div>
         </div>
       </div>

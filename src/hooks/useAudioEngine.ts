@@ -21,19 +21,34 @@ export function useAudioEngine() {
     setIsInitialized(true);
   }, [isInitialized]);
 
-  // Trigger sound
-  const trigger = useCallback(async () => {
+  // Trigger sound (optionally with a specific note) - one-shot, auto-releases
+  const trigger = useCallback(async (note?: string) => {
     if (!isInitialized) {
       await initialize();
     }
 
     setIsPlaying(true);
-    audioEngine.trigger();
+    audioEngine.trigger(note);
 
     // Reset playing state after sound duration
     const duration = (params.ampEnvelope.decay + params.ampEnvelope.release) * 1000;
     setTimeout(() => setIsPlaying(false), duration);
   }, [isInitialized, initialize, params.ampEnvelope]);
+
+  // Start a note (for keyboard hold - sustains until noteOff)
+  const noteOn = useCallback(async (note: string) => {
+    if (!isInitialized) {
+      await initialize();
+    }
+    setIsPlaying(true);
+    audioEngine.noteOn(note);
+  }, [isInitialized, initialize]);
+
+  // Release a note
+  const noteOff = useCallback(() => {
+    audioEngine.noteOff();
+    setIsPlaying(false);
+  }, []);
 
   // Update parameter helpers
   const updateSynth = useCallback((updates: Partial<Sound808Params['synth']>) => {
@@ -130,6 +145,14 @@ export function useAudioEngine() {
       filterEnvelope: { ...prev.filterEnvelope, ...updates },
     }));
     audioEngine.updateFilterEnvelope(updates);
+  }, []);
+
+  const updateLFO = useCallback((updates: Partial<Sound808Params['lfo']>) => {
+    setParams((prev) => ({
+      ...prev,
+      lfo: { ...prev.lfo, ...updates },
+    }));
+    audioEngine.updateLFO(updates);
   }, []);
 
   const updateMasterVolume = useCallback((db: number) => {
@@ -255,6 +278,8 @@ export function useAudioEngine() {
     currentTime,
     initialize,
     trigger,
+    noteOn,
+    noteOff,
     updateSynth,
     updateSubOscillator,
     updateNoiseLayer,
@@ -263,6 +288,7 @@ export function useAudioEngine() {
     updateDistortion,
     updateFilter,
     updateFilterEnvelope,
+    updateLFO,
     updateCompressor,
     updateEQ,
     updateReverb,

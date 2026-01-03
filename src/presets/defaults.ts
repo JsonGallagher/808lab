@@ -1,4 +1,4 @@
-import type { Preset, Sound808Params, SubOscillatorParams, NoiseLayerParams, FilterEnvelopeParams, ReverbParams, LimiterParams } from '../types';
+import type { Preset, Sound808Params, SubOscillatorParams, NoiseLayerParams, FilterEnvelopeParams, ReverbParams, LimiterParams, LFOParams } from '../types';
 
 // Default values for parameters
 const defaultSubOscillator: SubOscillatorParams = {
@@ -36,6 +36,15 @@ const defaultReverb: ReverbParams = {
 const defaultLimiter: LimiterParams = {
   enabled: true,
   threshold: -2,
+};
+
+const defaultLFO: LFOParams = {
+  enabled: false,
+  bpm: 140,
+  division: '1/8',
+  waveform: 'sine',
+  depth: 0.5,
+  target: 'filter',
 };
 
 // Classic 808 sub bass
@@ -87,6 +96,7 @@ const classic808: Sound808Params = {
   },
   reverb: { ...defaultReverb },
   limiter: { ...defaultLimiter },
+  lfo: { ...defaultLFO },
   masterVolume: -6,
 };
 
@@ -139,6 +149,7 @@ const distorted808: Sound808Params = {
   },
   reverb: { ...defaultReverb },
   limiter: { ...defaultLimiter, threshold: -6 },
+  lfo: { ...defaultLFO },
   masterVolume: -8,
 };
 
@@ -191,6 +202,7 @@ const deepSub: Sound808Params = {
   },
   reverb: { ...defaultReverb, enabled: true, decay: 2.5, mix: 0.15 },
   limiter: { ...defaultLimiter },
+  lfo: { ...defaultLFO },
   masterVolume: -6,
 };
 
@@ -243,6 +255,7 @@ const punchy808: Sound808Params = {
   },
   reverb: { ...defaultReverb },
   limiter: { ...defaultLimiter },
+  lfo: { ...defaultLFO },
   masterVolume: -6,
 };
 
@@ -295,6 +308,7 @@ const trapSub: Sound808Params = {
   },
   reverb: { ...defaultReverb },
   limiter: { ...defaultLimiter },
+  lfo: { ...defaultLFO },
   masterVolume: -6,
 };
 
@@ -347,6 +361,7 @@ const loFi808: Sound808Params = {
   },
   reverb: { ...defaultReverb, enabled: true, decay: 1.0, mix: 0.1 },
   limiter: { ...defaultLimiter, threshold: -6 },
+  lfo: { ...defaultLFO },
   masterVolume: -8,
 };
 
@@ -399,6 +414,7 @@ const smooth808: Sound808Params = {
   },
   reverb: { ...defaultReverb, enabled: true, decay: 2.0, preDelay: 0.02, mix: 0.25 },
   limiter: { ...defaultLimiter },
+  lfo: { ...defaultLFO },
   masterVolume: -6,
 };
 
@@ -451,6 +467,7 @@ const synthBass: Sound808Params = {
   },
   reverb: { ...defaultReverb },
   limiter: { ...defaultLimiter },
+  lfo: { ...defaultLFO },
   masterVolume: -6,
 };
 
@@ -503,6 +520,7 @@ const booming808: Sound808Params = {
   },
   reverb: { ...defaultReverb },
   limiter: { ...defaultLimiter, threshold: -3 },
+  lfo: { ...defaultLFO },
   masterVolume: -8,
 };
 
@@ -555,6 +573,7 @@ const tapeWarm: Sound808Params = {
   },
   reverb: { ...defaultReverb, enabled: true, decay: 1.2, mix: 0.12 },
   limiter: { ...defaultLimiter },
+  lfo: { ...defaultLFO },
   masterVolume: -6,
 };
 

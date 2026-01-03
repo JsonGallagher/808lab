@@ -9,8 +9,8 @@ Tone.getContext().lookAhead = 0.01; // 10ms instead of default 100ms
 // Default 808 parameters
 export const DEFAULT_PARAMS: Sound808Params = {
   synth: {
-    note: 'E1',
-    frequency: 41.2,
+    note: 'C2',
+    frequency: 65.4,
     waveform: 'sine',
     velocity: 0.8,
   },
@@ -47,7 +47,7 @@ export const DEFAULT_PARAMS: Sound808Params = {
   },
   filter: {
     type: 'lowpass',
-    frequency: 200,
+    frequency: 8000,
     resonance: 1,
   },
   filterEnvelope: {
@@ -67,10 +67,10 @@ export const DEFAULT_PARAMS: Sound808Params = {
     makeupGain: 0,
   },
   eq: {
-    lowGain: 3,
+    lowGain: 0,
     midGain: 0,
     midFreq: 400,
-    highGain: -3,
+    highGain: 0,
   },
   reverb: {
     enabled: false,
@@ -81,6 +81,14 @@ export const DEFAULT_PARAMS: Sound808Params = {
   limiter: {
     enabled: true,
     threshold: -2,
+  },
+  lfo: {
+    enabled: false,
+    bpm: 140,
+    division: '1/8',
+    waveform: 'sine',
+    depth: 0.5,
+    target: 'filter',
   },
   masterVolume: -6,
 };
@@ -126,6 +134,10 @@ export class AudioEngine {
   private analyser: Tone.Analyser | null = null;
   private fftAnalyser: Tone.Analyser | null = null;
   private bypassGain: Tone.Gain | null = null;
+
+  // LFO for wobble effects
+  private lfo: Tone.LFO | null = null;
+  private lfoGain: Tone.Gain | null = null; // Controls LFO depth
 
   private params: Sound808Params = { ...DEFAULT_PARAMS };
   private isInitialized = false;
@@ -229,6 +241,22 @@ export class AudioEngine {
     if (this.params.filterEnvelope.enabled) {
       this.filterEnvelope.connect(this.filter.frequency);
     }
+
+    // === LFO FOR WOBBLE ===
+    const lfoFreq = this.calculateLFOFrequency(this.params.lfo.bpm, this.params.lfo.division);
+    // LFO directly modulates filter frequency from low (100Hz) to high based on depth
+    const lfoMax = 100 + (this.params.lfo.depth * 6000); // 100Hz to 6100Hz max
+    this.lfo = new Tone.LFO({
+      frequency: lfoFreq,
+      type: this.params.lfo.waveform,
+      min: 100,
+      max: lfoMax,
+    });
+    // LFO gain acts as on/off switch
+    this.lfoGain = new Tone.Gain(this.params.lfo.enabled ? 1 : 0);
+    this.lfo.connect(this.lfoGain);
+    this.lfoGain.connect(this.filter.frequency);
+    this.lfo.start();
 
     // === OTHER EFFECTS ===
     this.compressor = new Tone.Compressor({
@@ -426,16 +454,19 @@ export class AudioEngine {
     }
   }
 
-  // Trigger the 808 sound
-  trigger(): void {
+  // Trigger the 808 sound (optionally with a specific note)
+  trigger(note?: string): void {
     if (!this.synth || !this.isInitialized) return;
 
     const now = Tone.now();
     this.triggerTime = now;
     const { synth, subOscillator, pitchEnvelope, ampEnvelope } = this.params;
 
+    // Use provided note or fall back to synth params
+    const playNote = note || synth.note;
+
     // Calculate frequencies
-    const baseFreq = Tone.Frequency(synth.note).toFrequency();
+    const baseFreq = Tone.Frequency(playNote).toFrequency();
     const startFreq = baseFreq * Math.pow(2, pitchEnvelope.startOffset / 12);
 
     // Calculate sub frequency (1 or 2 octaves below)
@@ -505,6 +536,73 @@ export class AudioEngine {
     }
   }
 
+  // Start a note (for keyboard hold - doesn't auto-release)
+  noteOn(note: string): void {
+    if (!this.synth || !this.isInitialized) return;
+
+    const now = Tone.now();
+    this.triggerTime = now;
+    const { synth, subOscillator, pitchEnvelope } = this.params;
+
+    // Calculate frequencies
+    const baseFreq = Tone.Frequency(note).toFrequency();
+    const startFreq = baseFreq * Math.pow(2, pitchEnvelope.startOffset / 12);
+
+    // Calculate sub frequency
+    const subOctaveMultiplier = subOscillator.octave === -2 ? 0.25 : 0.5;
+    const subBaseFreq = baseFreq * subOctaveMultiplier;
+    const subStartFreq = startFreq * subOctaveMultiplier;
+    const detuneMultiplier = Math.pow(2, subOscillator.detune / 1200);
+
+    // === TRIGGER MAIN SYNTH (no scheduled release) ===
+    this.synth.triggerAttack(startFreq, now, synth.velocity);
+
+    // Pitch envelope
+    if (pitchEnvelope.curve === 'exponential') {
+      this.synth.frequency.exponentialRampTo(Math.max(baseFreq, 1), pitchEnvelope.decayTime, now);
+    } else {
+      this.synth.frequency.linearRampTo(baseFreq, pitchEnvelope.decayTime, now);
+    }
+
+    // === TRIGGER SUB OSCILLATOR ===
+    if (this.subSynth && subOscillator.enabled) {
+      this.subSynth.triggerAttack(subStartFreq * detuneMultiplier, now, synth.velocity);
+
+      if (pitchEnvelope.curve === 'exponential') {
+        this.subSynth.frequency.exponentialRampTo(Math.max(subBaseFreq * detuneMultiplier, 1), pitchEnvelope.decayTime, now);
+      } else {
+        this.subSynth.frequency.linearRampTo(subBaseFreq * detuneMultiplier, pitchEnvelope.decayTime, now);
+      }
+    }
+
+    // === TRIGGER NOISE (short burst at start) ===
+    if (this.noiseEnvelope && this.params.noiseLayer.enabled) {
+      this.noiseEnvelope.triggerAttackRelease(this.params.noiseLayer.attack + this.params.noiseLayer.decay, now);
+    }
+
+    // === TRIGGER FILTER ENVELOPE ===
+    if (this.filterEnvelope && this.params.filterEnvelope.enabled) {
+      this.filterEnvelope.triggerAttack(now);
+    }
+  }
+
+  // Release a note (for keyboard release)
+  noteOff(): void {
+    if (!this.synth || !this.isInitialized) return;
+
+    const now = Tone.now();
+
+    this.synth.triggerRelease(now);
+
+    if (this.subSynth && this.params.subOscillator.enabled) {
+      this.subSynth.triggerRelease(now);
+    }
+
+    if (this.filterEnvelope && this.params.filterEnvelope.enabled) {
+      this.filterEnvelope.triggerRelease(now);
+    }
+  }
+
   // Get waveform data for visualization
   getWaveformData(): Float32Array {
     if (!this.analyser) return new Float32Array(256);
@@ -545,12 +643,22 @@ export class AudioEngine {
   updateAmpEnvelope(params: Partial<Sound808Params['ampEnvelope']>): void {
     this.params.ampEnvelope = { ...this.params.ampEnvelope, ...params };
 
+    const { attack, decay, sustain, release } = this.params.ampEnvelope;
+
+    // Update main synth envelope
     if (this.synth) {
-      const { attack, decay, sustain, release } = this.params.ampEnvelope;
       this.synth.envelope.attack = attack;
       this.synth.envelope.decay = decay;
       this.synth.envelope.sustain = sustain;
       this.synth.envelope.release = release;
+    }
+
+    // Update sub oscillator envelope (should match main synth)
+    if (this.subSynth) {
+      this.subSynth.envelope.attack = attack;
+      this.subSynth.envelope.decay = decay;
+      this.subSynth.envelope.sustain = sustain;
+      this.subSynth.envelope.release = release;
     }
   }
 
@@ -746,6 +854,48 @@ export class AudioEngine {
     }
   }
 
+  // Calculate LFO frequency from BPM and note division
+  private calculateLFOFrequency(bpm: number, division: string): number {
+    const beatsPerSecond = bpm / 60;
+    const divisionMultipliers: Record<string, number> = {
+      '1/2': 0.5,
+      '1/4': 1,
+      '1/8': 2,
+      '1/16': 4,
+      '1/32': 8,
+    };
+    return beatsPerSecond * (divisionMultipliers[division] || 1);
+  }
+
+  // Update LFO
+  updateLFO(params: Partial<Sound808Params['lfo']>): void {
+    this.params.lfo = { ...this.params.lfo, ...params };
+
+    if (this.lfo) {
+      // Update frequency if BPM or division changed
+      if (params.bpm !== undefined || params.division !== undefined) {
+        const freq = this.calculateLFOFrequency(this.params.lfo.bpm, this.params.lfo.division);
+        this.lfo.frequency.value = freq;
+      }
+
+      // Update waveform
+      if (params.waveform !== undefined) {
+        this.lfo.type = params.waveform;
+      }
+
+      // Update depth (affects max frequency)
+      if (params.depth !== undefined) {
+        const lfoMax = 100 + (this.params.lfo.depth * 6000);
+        this.lfo.max = lfoMax;
+      }
+    }
+
+    // Update enabled state via lfoGain
+    if (this.lfoGain && params.enabled !== undefined) {
+      this.lfoGain.gain.value = params.enabled ? 1 : 0;
+    }
+  }
+
   // Update master volume
   updateMasterVolume(db: number): void {
     this.params.masterVolume = db;
@@ -776,6 +926,7 @@ export class AudioEngine {
     this.updateEQ(params.eq);
     this.updateReverb(params.reverb);
     this.updateLimiter(params.limiter);
+    this.updateLFO(params.lfo);
     this.updateMasterVolume(params.masterVolume);
 
     // Re-establish effects connection if it was connected
@@ -972,6 +1123,10 @@ export class AudioEngine {
     this.filter?.dispose();
     this.filterEnvelope?.dispose();
 
+    // LFO
+    this.lfo?.dispose();
+    this.lfoGain?.dispose();
+
     // Other effects
     this.compressor?.dispose();
     this.eq?.dispose();
@@ -1002,6 +1157,8 @@ export class AudioEngine {
     this.distortionMix = null;
     this.filter = null;
     this.filterEnvelope = null;
+    this.lfo = null;
+    this.lfoGain = null;
     this.compressor = null;
     this.eq = null;
     this.reverb = null;

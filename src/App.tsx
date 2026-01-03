@@ -9,6 +9,7 @@ import {
   OutputWindow,
   PresetsWindow,
   AboutWindow,
+  KeyboardWindow,
 } from './components/windows';
 import { CablesManager, CablesOverlay } from './components/Cables';
 import { useAudioEngine } from './hooks/useAudioEngine';
@@ -19,7 +20,7 @@ import './styles/retro.css';
 import './styles/windows.css';
 import './styles/controls.css';
 
-type WindowId = 'synth' | 'effects' | 'output' | 'presets' | 'about';
+type WindowId = 'synth' | 'effects' | 'output' | 'presets' | 'about' | 'keyboard';
 
 interface WindowStates {
   [key: string]: {
@@ -33,13 +34,14 @@ const INITIAL_WINDOW_STATES: WindowStates = {
   effects: { isVisible: true, zIndex: 2 },
   output: { isVisible: true, zIndex: 3 },
   presets: { isVisible: true, zIndex: 4 },
+  keyboard: { isVisible: true, zIndex: 5 },
   about: { isVisible: false, zIndex: 0 },
 };
 
 function App() {
   const [windowStates, setWindowStates] = useState<WindowStates>(INITIAL_WINDOW_STATES);
   const [focusedWindow, setFocusedWindow] = useState<WindowId>('synth');
-  const [maxZIndex, setMaxZIndex] = useState(5);
+  const [maxZIndex, setMaxZIndex] = useState(6);
 
   // Calculate window layouts based on viewport size
   const [windowLayouts, setWindowLayouts] = useState(() =>
@@ -56,6 +58,7 @@ function App() {
   };
 
   const {
+    isInitialized,
     isPlaying,
     params,
     waveformData,
@@ -63,6 +66,8 @@ function App() {
     triggerTime,
     currentTime,
     trigger,
+    noteOn,
+    noteOff,
     updateSynth,
     updateSubOscillator,
     updateNoiseLayer,
@@ -71,6 +76,7 @@ function App() {
     updateDistortion,
     updateFilter,
     updateFilterEnvelope,
+    updateLFO,
     updateCompressor,
     updateEQ,
     updateReverb,
@@ -183,6 +189,10 @@ function App() {
           action: () => handleShowWindow('effects'),
         },
         {
+          label: 'Keyboard',
+          action: () => handleShowWindow('keyboard'),
+        },
+        {
           label: 'Output',
           action: () => handleShowWindow('output'),
         },
@@ -223,6 +233,7 @@ function App() {
         onUpdateNoiseLayer={updateNoiseLayer}
         onUpdatePitchEnvelope={updatePitchEnvelope}
         onUpdateAmpEnvelope={updateAmpEnvelope}
+        onUpdateLFO={updateLFO}
         windowState={getWindowState('synth')}
         onClose={() => handleCloseWindow('synth')}
         onFocus={() => handleFocusWindow('synth')}
@@ -284,6 +295,18 @@ function App() {
         windowState={getWindowState('about')}
         onClose={() => handleCloseWindow('about')}
         onFocus={() => handleFocusWindow('about')}
+      />
+
+      <KeyboardWindow
+        onNoteOn={noteOn}
+        onNoteOff={noteOff}
+        isPlaying={isPlaying}
+        isAudioReady={isInitialized}
+        windowState={getWindowState('keyboard')}
+        onClose={() => handleCloseWindow('keyboard')}
+        onFocus={() => handleFocusWindow('keyboard')}
+        initialPosition={getWindowLayout('keyboard').position}
+        initialSize={getWindowLayout('keyboard').size}
       />
     </Desktop>
   );

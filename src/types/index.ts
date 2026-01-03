@@ -113,6 +113,16 @@ export interface LimiterParams {
   threshold: number;   // -12 to 0 dB
 }
 
+// LFO for wobble/modulation effects
+export interface LFOParams {
+  enabled: boolean;
+  bpm: number;                    // 60-200 tempo
+  division: '1/2' | '1/4' | '1/8' | '1/16' | '1/32';  // note division
+  waveform: 'sine' | 'square' | 'triangle' | 'sawtooth';
+  depth: number;                  // 0-1 modulation amount
+  target: 'filter';               // what to modulate (filter frequency for now)
+}
+
 // Complete 808 parameters
 export interface Sound808Params {
   synth: SynthParams;
@@ -127,6 +137,7 @@ export interface Sound808Params {
   eq: EQParams;
   reverb: ReverbParams;
   limiter: LimiterParams;
+  lfo: LFOParams;
   masterVolume: number; // dB
 }
 

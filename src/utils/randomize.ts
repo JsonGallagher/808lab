@@ -127,6 +127,15 @@ export function generateRandomParams(): Sound808Params {
       threshold: randomRange(-6, -1),
     },
 
+    lfo: {
+      enabled: false, // LFO off by default for randomize
+      bpm: 140,
+      division: randomChoice(['1/4', '1/8', '1/16'] as const),
+      waveform: randomChoice(['sine', 'square', 'triangle', 'sawtooth'] as const),
+      depth: randomRange(0.3, 0.7),
+      target: 'filter' as const,
+    },
+
     masterVolume: randomRange(-12, -3),
   };
 }

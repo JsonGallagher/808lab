@@ -3,3 +3,4 @@ export { EffectsWindow } from './EffectsWindow';
 export { OutputWindow } from './OutputWindow';
 export { PresetsWindow } from './PresetsWindow';
 export { AboutWindow } from './AboutWindow';
+export { KeyboardWindow } from './KeyboardWindow';
