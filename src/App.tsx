@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { exportToWAV } from './audio/wavExport';
 import { generateRandomParams } from './utils/randomize';
 import { calculateWindowLayout } from './utils/windowLayout';
@@ -43,15 +43,10 @@ function App() {
   const [focusedWindow, setFocusedWindow] = useState<WindowId>('synth');
   const [maxZIndex, setMaxZIndex] = useState(6);
 
-  // Calculate window layouts based on viewport size
-  const [windowLayouts, setWindowLayouts] = useState(() =>
+  // Calculate window layouts based on viewport size (only on initial mount)
+  const [windowLayouts] = useState(() =>
     calculateWindowLayout(window.innerWidth, window.innerHeight)
   );
-
-  // Recalculate layout only on initial mount (not on resize, as users may have moved windows)
-  useEffect(() => {
-    setWindowLayouts(calculateWindowLayout(window.innerWidth, window.innerHeight));
-  }, []);
 
   const getWindowLayout = (id: string): { position: WindowPosition; size: WindowSize } => {
     return windowLayouts[id] || { position: { x: 50, y: 50 }, size: { width: 300, height: 400 } };
