@@ -139,8 +139,11 @@ export function KeyboardWindow({
       next.delete(note);
       return next;
     });
-    onNoteOffProp();
-  }, [onNoteOffProp]);
+    // Only trigger release if this was the last key held
+    if (pressedKeys.size === 1 && pressedKeys.has(note)) {
+      onNoteOffProp();
+    }
+  }, [pressedKeys, onNoteOffProp]);
 
   const { isConnected, deviceName } = useMIDI({
     onNoteOn: handleMIDINoteOn,
