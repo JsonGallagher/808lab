@@ -2,7 +2,7 @@
 
 A retro-styled 808 bass synthesizer with a classic Macintosh-inspired UI. Built with React, TypeScript, and Tone.js.
 
-![808Lab Preview](previews/app_preview.png)
+![808Lab Preview](previews/app-preview.png)
 
 ## Features
 
